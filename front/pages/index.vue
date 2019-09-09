@@ -1,68 +1,119 @@
 <template>
-  <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        front
-      </h1>
-      <h2 class="subtitle">
-        My slick Nuxt.js project
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green">
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
+  <div>
+    <!--      時計-->
+    <clock class="mb-2" />
+
+    <b-card-group deck>
+      <b-card title="本社" img-src="~/assets/本社.jpeg" img-alt="Image" img-top>
+        <b-card-text>
+          <b-table :dark="true" stacked :items="ibarakiFactory" />
+        </b-card-text>
+      </b-card>
+
+      <b-card
+        title="茨城工場"
+        img-src="~/assets/茨城工場.jpg"
+        img-alt="Image"
+        img-top
+        img-height="120%"
+      >
+        <b-card-text>
+          <b-table :dark="true" stacked :items="tokyoOffice" />
+        </b-card-text>
+      </b-card>
+
+      <b-card
+        title="白河工場"
+        img-src="~/assets/白河工場.jpg"
+        img-alt="Image"
+        img-top
+        img-height="120%"
+      >
+        <b-card-text>
+          <b-table :dark="true" stacked :items="shirakawaFactory" />
+        </b-card-text>
+      </b-card>
+
+      <b-card
+        title="大阪営業所"
+        img-src="~/assets/大阪営業所.jpg"
+        img-alt="Image"
+        img-top
+        tag="article"
+      >
+        <b-card-text>
+          <b-table :dark="true" stacked :items="osakaOffice" />
+        </b-card-text>
+      </b-card>
+
+      <b-card
+        title="大阪工場"
+        img-src="~/assets/大阪工場.png"
+        img-alt="Image"
+        img-top
+        tag="article"
+        img-height="40%"
+      >
+        <b-card-text>
+          <b-table :dark="true" stacked :items="osakaFactory" />
+        </b-card-text>
+      </b-card>
+    </b-card-group>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-
+import Clock from '~/components/Clock.vue'
+const findRegionWeather = (data, region) => {
+  return data
+    .filter((obj) => obj.region === region)
+    .map((obj) => ({
+      天気: obj.condition,
+      温度: obj.temp,
+      最高気温: obj.temp_max,
+      最低気温: obj.temp_min,
+      測定時間: obj.time
+    }))
+}
 export default {
   components: {
-    Logo
+    Clock
+  },
+  async asyncData({ app }) {
+    const response = await app.$axios.get('/api/v1/weather')
+    return { weatherDate: response.data.weather }
+  },
+  data() {
+    return {}
+  },
+  mounted() {
+    setInterval(() => this.getDate(), 1000 * 60 * 60)
+  },
+  methods: {
+    async getDate() {
+      console.log('get')
+      const res = await this.$axios.get('/api/v1/weather')
+      this.weatherDate = res.data.weather
+    }
+  },
+  computed: {
+    ibarakiFactory() {
+      return findRegionWeather(this.weatherDate, '茨城工場')
+    },
+    tokyoOffice() {
+      return findRegionWeather(this.weatherDate, '本社')
+    },
+    shirakawaFactory() {
+      return findRegionWeather(this.weatherDate, '白河工場')
+    },
+    osakaOffice() {
+      return findRegionWeather(this.weatherDate, '大阪営業所')
+    },
+    osakaFactory() {
+      return findRegionWeather(this.weatherDate, '大阪工場')
+    }
   }
 }
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
-</style>
+<style></style>

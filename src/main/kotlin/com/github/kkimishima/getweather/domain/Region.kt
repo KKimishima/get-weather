@@ -28,7 +28,7 @@ sealed class Region {
   }
 
   object OsakaFactory : Region() {
-    override val value: String = "Osaka-shi"
+    override val value: String = "Toyonaka"
     override val name: RegionName = RegionName("大阪工場")
   }
 
